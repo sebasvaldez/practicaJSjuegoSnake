@@ -3,11 +3,12 @@ const context = myCanvas.getContext("2d");
 
 const sizeX = 20;
 const sizeY = 10;
-const snakeHead = {
+
+let snakeHead = {
   x: 0,
   y: 0,
 };
-const snakeBody = [];
+let snakeBody = [];
 //Creando el alimento de la cerpiente
 
 let food = null;
@@ -55,18 +56,66 @@ const increaseSnakeSize = (prevX, prevY) => {
   snakeBody.push({ x: prevX, y: prevY });
 };
 
+const gameOver = () => {
+  alert("has perdido");
+  snakeHead.x = 0;
+  snakeHead.y = 0;
+  dx = 0;
+  dy = 0;
+  snakeBody = [];
+};
+
 const checkSnakeCollision = () => {
   //la colision de la cabeza con su propio cuerpo se va a dar cuando las coor de la cabeza sea igual a las de algun elemento del cuerpo
 
   for (let i = 0; i < snakeBody.length; i++) {
     if (snakeHead.x == snakeBody[i].x && snakeHead.y == snakeBody[i].y) {
-      alert("Perdiste");
+      return true;
     }
+  }
+
+  //Verificar que la serpiente no se salga de los limites
+  const topCollision = snakeHead.y < 0;
+  const bottomCollision = snakeHead.y > 140;
+  const leftCollision = snakeHead.x < 0;
+  const rightCollision = snakeHead.x > 280;
+
+  if (topCollision || bottomCollision || leftCollision || rightCollision) {
+    return true;
+  }
+
+  return false;
+};
+
+const checkFoodCollision = (position) => {
+  //compara las coordenadas del alimento generado con el cuerpo de la serpiente
+  for (let i = 0; i < snakeBody.length; i++) {
+    if (position.x == snakeBody[i].x && position.y == snakeBody[i].y) {
+      return true;
+    }
+  }
+
+  //compara las coordenadas del alimento generado con la cabeza de la serpiente!!
+  if (position.x == snakeHead.x && position.y == snakeHead.y) {
+    return true;
   }
 };
 
+const randomFoodPosition = () => {
+  let position;
+  do {
+    position = { x: getRandomX(), y: getRandomY() };
+  } while (checkFoodCollision(position));
+  return position;
+};
+
 const update = () => {
-  checkSnakeCollision();
+  const youLose = checkSnakeCollision();
+  if (youLose) {
+    gameOver();
+    console.log("perdiste");
+    return;
+  }
 
   //guardar la posicion previa del ultimo elemento de serpiente para agregarla como parte del cuerpo al consumir un alimento
   let prevX, prevY;
@@ -97,10 +146,7 @@ const update = () => {
   //genera el alimento en caso de que no exista
 
   if (food == null) {
-    food = {
-      x: getRandomX(),
-      y: getRandomY(),
-    };
+    food = randomFoodPosition();
     console.log(food);
     console.log(snakeHead);
   }
@@ -162,5 +208,5 @@ const moveSnake = (event) => {
   }
 };
 
-setInterval(main, 200);
+setInterval(main, 150);
 document.addEventListener("keydown", moveSnake);
