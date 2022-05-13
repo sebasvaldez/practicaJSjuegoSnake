@@ -16,6 +16,10 @@ let food = null;
 let dx = 0;
 let dy = 0;
 
+//esta variable toma como valor el ultimo eje en el que se mueve la serpiente
+
+let lastAxis;
+
 //este codigo genera un rectangulo que tiene su inicio en las coordenadas 0,0 y termina en 20,20
 
 //Creo una funcion que recibe snakeHead y size como tamaño de la snake
@@ -142,6 +146,12 @@ const update = () => {
   //actualiza las coordenadas de la cabeza de la serpiente
   snakeHead.x += dx;
   snakeHead.y += dy;
+
+  if (dx !== 0) {
+    lastAxis = "X";
+  } else if (dy !== 0) {
+    lastAxis = "Y";
+  }
 
   //genera el alimento en caso de que no exista
 
